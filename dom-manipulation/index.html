@@ -7,42 +7,31 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <div id="app-container">
         <h1>Dynamic Quote Generator</h1>
 
-        <!-- Category Selector -->
-        <div class="category-section">
-            <label for="category-select">Select a Category:</label>
-            <select id="category-select">
+        <!-- Category Filter -->
+        <div>
+            <label for="category-filter">Filter by Category:</label>
+            <select id="category-filter">
                 <option value="">Select Category</option>
             </select>
         </div>
 
-        <!-- Button to generate quote -->
-        <button id="generate-quote-btn">Generate Quote</button>
-
-        <!-- Display the selected quote -->
-        <div id="quote-display">
-            <p>No quote selected. Choose a category!</p>
+        <!-- Filtered Quotes Display -->
+        <div id="filtered-quotes-display">
+            <p>Select a category to see quotes.</p>
         </div>
 
-        <!-- Add New Quote Section -->
+        <!-- Add Quote Form -->
         <div id="add-quote-container">
-            <!-- Form to add a new quote -->
+            <h2>Add a New Quote</h2>
         </div>
 
-        <!-- Show the list of quotes in each category -->
-        <div id="quote-list">
-            <h2>Quotes by Category</h2>
-            <ul id="quote-list-content">
-                <!-- Dynamic content here -->
-            </ul>
-        </div>
-
-        <!-- Export and Import Section -->
-        <div id="import-export">
-            <button id="export-quotes-btn">Export Quotes (JSON)</button>
-            <input type="file" id="import-quotes-file" accept=".json" />
+        <!-- Export and Import Buttons -->
+        <div id="export-import">
+            <button id="export-quotes">Export Quotes</button>
+            <input type="file" id="import-quotes" />
         </div>
     </div>
 
