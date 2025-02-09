@@ -1,12 +1,16 @@
-// Array to hold quote objects
-let quotes = [
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
     { text: "The best time to plant a tree was 20 years ago. The second best time is now.", category: "Inspiration" },
     { text: "Do not go where the path may lead, go instead where there is no path and leave a trail.", category: "Inspiration" },
     { text: "Life is what happens when you're busy making other plans.", category: "Life" },
     { text: "The purpose of life is not to be happy. It is to be useful, to be honorable, to be compassionate, to have it make some difference that you have lived and lived well.", category: "Life" },
 ];
 
-// Function to display a random quote from a selected category
+// Save quotes to localStorage
+function saveQuotesToLocalStorage() {
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+// Display a random quote based on selected category
 function showRandomQuote() {
     const selectedCategory = document.getElementById('category-select').value;
     const quoteDisplay = document.getElementById('quote-display');
@@ -17,12 +21,15 @@ function showRandomQuote() {
     if (filteredQuotes.length > 0) {
         const randomQuote = filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)];
         quoteDisplay.innerHTML = `<p>"${randomQuote.text}"</p><p><strong>- ${randomQuote.category}</strong></p>`;
+
+        // Store the last viewed quote in sessionStorage
+        sessionStorage.setItem("lastViewedQuote", JSON.stringify(randomQuote));
     } else {
         quoteDisplay.innerHTML = `<p>No quotes found for this category.</p>`;
     }
 }
 
-// Function to create the form to add a new quote
+// Create the form to add a new quote
 function createAddQuoteForm() {
     const formContainer = document.getElementById('add-quote-container');
     formContainer.innerHTML = '';
@@ -69,6 +76,9 @@ function createAddQuoteForm() {
             // Add the new quote to the quotes array
             quotes.push({ text: newQuote, category: newCategory });
 
+            // Save the updated quotes to localStorage
+            saveQuotesToLocalStorage();
+
             // Clear the form fields
             categoryInput.value = '';
             quoteInput.value = '';
@@ -85,7 +95,7 @@ function createAddQuoteForm() {
     });
 }
 
-// Function to update the category dropdown
+// Update the category dropdown
 function updateCategoryDropdown() {
     const categorySelect = document.getElementById('category-select');
     const categories = Array.from(new Set(quotes.map(quote => quote.category)));
@@ -100,7 +110,7 @@ function updateCategoryDropdown() {
     });
 }
 
-// Function to display all quotes grouped by category
+// Display all quotes grouped by category
 function displayQuoteList() {
     const quoteListContent = document.getElementById('quote-list-content');
     quoteListContent.innerHTML = ''; // Clear current list
@@ -113,10 +123,12 @@ function displayQuoteList() {
         categoryItem.innerHTML = `<strong>${category}</strong>`;
 
         const quotesList = document.createElement('ul');
-        quotes.filter(quote => quote.category === category).forEach(quote => {
-            const quoteItem = document.createElement('li');
-            quoteItem.textContent = quote.text;
-            quotesList.appendChild(quoteItem);
+        const categoryQuotes = quotes.filter(quote => quote.category === category);
+
+        categoryQuotes.forEach(quote => {
+            const listItem = document.createElement('li');
+            listItem.textContent = quote.text;
+            quotesList.appendChild(listItem);
         });
 
         categoryItem.appendChild(quotesList);
@@ -124,21 +136,77 @@ function displayQuoteList() {
     });
 }
 
-// Initialize the page
-function init() {
-    // Populate the category dropdown with existing categories
-    updateCategoryDropdown();
-
-    // Add event listener for the "Generate Quote" button
-    const generateQuoteButton = document.getElementById('generate-quote-btn');
-    generateQuoteButton.addEventListener('click', showRandomQuote);
-
-    // Initialize the "Add Quote" form
-    createAddQuoteForm();
-
-    // Display the initial list of quotes
-    displayQuoteList();
+// Load the last viewed quote from sessionStorage (if available)
+function loadLastViewedQuote() {
+    const lastViewedQuote = JSON.parse(sessionStorage.getItem("lastViewedQuote"));
+    if (lastViewedQuote) {
+        const quoteDisplay = document.getElementById('quote-display');
+        quoteDisplay.innerHTML = `<p>"${lastViewedQuote.text}"</p><p><strong>- ${lastViewedQuote.category}</strong></p>`;
+    }
 }
 
-// Run the init function when the page loads
-window.onload = init;
+// Export quotes to a JSON file
+function exportQuotesToJSON() {
+    const dataStr = JSON.stringify(quotes, null, 2);  // Format with indentation
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "quotes.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a); // Clean up the link
+}
+
+// Import quotes from a JSON file
+function importQuotesFromJSON(file) {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        try {
+            const importedQuotes = JSON.parse(event.target.result);
+            if (Array.isArray(importedQuotes)) {
+                quotes = importedQuotes;
+                saveQuotesToLocalStorage();  // Save to localStorage after import
+                updateCategoryDropdown();   // Update categories
+                displayQuoteList();         // Display quotes list
+                alert("Quotes imported successfully!");
+            } else {
+                alert("Invalid JSON format.");
+            }
+        } catch (error) {
+            alert("Failed to parse JSON file.");
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+// Initialize the app: Update category dropdown, display quote list, and load last viewed quote
+function initializeApp() {
+    updateCategoryDropdown();
+    displayQuoteList();
+    loadLastViewedQuote();
+}
+
+// Initialize the app on page load
+window.onload = initializeApp;
+
+// Add event listener to the "Generate Quote" button
+document.getElementById('generate-quote-btn').addEventListener('click', showRandomQuote);
+
+// Add event listener to the "Add New Quote" section
+createAddQuoteForm();
+
+// Add event listener for the "Export Quotes" button
+document.getElementById('export-quotes-btn').addEventListener('click', exportQuotesToJSON);
+
+// Add event listener for the "Import Quotes" file input
+document.getElementById('import-quotes-file').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        importQuotesFromJSON(file);
+    }
+});
+
