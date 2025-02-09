@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Quote Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Dynamic Quote Generator</h1>
+
+        <!-- Category Selector -->
+        <div class="category-section">
+            <label for="category-select">Select a Category:</label>
+            <select id="category-select">
+                <option value="">Select Category</option>
+            </select>
+        </div>
+
+        <!-- Button to generate quote -->
+        <button id="generate-quote-btn">Generate Quote</button>
+
+        <!-- Display the selected quote -->
+        <div id="quote-display">
+            <p>No quote selected. Choose a category!</p>
+        </div>
+
+        <!-- Add New Quote Section -->
+        <div id="add-quote-container">
+            <!-- Form to add a new quote -->
+        </div>
+
+        <!-- Show the list of quotes in each category -->
+        <div id="quote-list">
+            <h2>Quotes by Category</h2>
+            <ul id="quote-list-content">
+                <!-- Dynamic content here -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
